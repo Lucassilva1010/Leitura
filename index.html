@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌟 Aprenda a Ler - Jogo Interativo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .game-title {
+            font-size: 2.5rem;
+            color: #4a5568;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .instructions {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 15px;
+            border: 2px solid #f6ad55;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 2rem;
+        }
+
+        .score-item {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: bold;
+            border: 2px solid #4fd1c7;
+        }
+
+        .word-display {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #2d3748;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            border-radius: 20px;
+            border: 3px solid #f6ad55;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .images-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .image-option {
+            width: 120px;
+            height: 120px;
+            border-radius: 15px;
+            border: 3px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0 auto;
+        }
+
+        .image-option:hover {
+            transform: scale(1.1);
+            border-color: #4299e1;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .image-option.correct {
+            border-color: #48bb78;
+            background: linear-gradient(135deg, #68d391 0%, #38b2ac 100%);
+            animation: correctAnswer 0.6s ease;
+        }
+
+        .image-option.incorrect {
+            border-color: #f56565;
+            background: linear-gradient(135deg, #fc8181 0%, #f56565 100%);
+            animation: shake 0.5s ease;
+        }
+
+        @keyframes correctAnswer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        .feedback {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            min-height: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback.correct {
+            color: #38a169;
+        }
+
+        .feedback.incorrect {
+            color: #e53e3e;
+        }
+
+        .next-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .next-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .next-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .celebration {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            z-index: 1000;
+            animation: celebrate 1s ease;
+            pointer-events: none;
+        }
+
+        @keyframes celebrate {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 0; }
+        }
+
+        @media (max-width: 600px) {
+            .game-title {
+                font-size: 2rem;
+            }
+            
+            .word-display {
+                font-size: 2.5rem;
+            }
+            
+            .image-option {
+                width: 100px;
+                height: 100px;
+                font-size: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title">🌟 Aprenda a Ler! 🌟</h1>
+        
+        <div class="instructions">
+            📚 Olhe a palavra e clique na imagem que representa ela! 📚
+        </div>
+
+        <div class="score-board">
+            <div class="score-item">
+                🏆 Acertos: <span id="correct-score">0</span>
+            </div>
+            <div class="score-item">
+                📊 Total: <span id="total-score">0</span>
+            </div>
+        </div>
+
+        <div class="word-display" id="word-display">
+            GATO
+        </div>
+
+        <div class="images-container" id="images-container">
+            <!-- Imagens serão inseridas aqui dinamicamente -->
+        </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <button class="next-button" id="next-button" onclick="nextWord()" disabled>
+            Próxima Palavra ➡️
+        </button>
+    </div>
+
+    <script>
+        // Dados do jogo - palavras com seus emojis correspondentes
+        const gameData = [
+            // Animais
+            {
+                word: "GATO",
+                correct: "🐱",
+                options: ["🐱", "🐶", "🐸", "🐯"]
+            },
+            {
+                word: "CACHORRO",
+                correct: "🐶",
+                options: ["🐶", "🐱", "🐰", "🐸"]
+            },
+            {
+                word: "PEIXE",
+                correct: "🐠",
+                options: ["🐠", "🐸", "🦋", "🐱"]
+            },
+            {
+                word: "PÁSSARO",
+                correct: "🐦",
+                options: ["🐦", "🦋", "🐸", "🐱"]
+            },
+            {
+                word: "COELHO",
+                correct: "🐰",
+                options: ["🐰", "🐶", "🐱", "🐸"]
+            },
+            {
+                word: "VACA",
+                correct: "🐄",
+                options: ["🐄", "🐷", "🐑", "🐴"]
+            },
+            {
+                word: "PORCO",
+                correct: "🐷",
+                options: ["🐷", "🐄", "🐑", "🐶"]
+            },
+            {
+                word: "GALINHA",
+                correct: "🐔",
+                options: ["🐔", "🐦", "🦆", "🐧"]
+            },
+            
+            // Objetos da casa
+            {
+                word: "CASA",
+                correct: "🏠",
+                options: ["🏠", "🚗", "🌳", "⭐"]
+            },
+            {
+                word: "CAMA",
+                correct: "🛏️",
+                options: ["🛏️", "🪑", "🚪", "🪟"]
+            },
+            {
+                word: "MESA",
+                correct: "🪑",
+                options: ["🪑", "🛏️", "🚪", "📺"]
+            },
+            {
+                word: "TELEFONE",
+                correct: "📱",
+                options: ["📱", "📺", "💻", "⌚"]
+            },
+            {
+                word: "TELEVISÃO",
+                correct: "📺",
+                options: ["📺", "💻", "📱", "📻"]
+            },
+            
+            // Natureza
+            {
+                word: "SOL",
+                correct: "☀️",
+                options: ["☀️", "🌙", "⭐", "🌈"]
+            },
+            {
+                word: "LUA",
+                correct: "🌙",
+                options: ["🌙", "☀️", "⭐", "🌍"]
+            },
+            {
+                word: "ESTRELA",
+                correct: "⭐",
+                options: ["⭐", "☀️", "🌙", "💫"]
+            },
+            {
+                word: "FLOR",
+                correct: "🌸",
+                options: ["🌸", "🌳", "🍎", "🦋"]
+            },
+            {
+                word: "ÁRVORE",
+                correct: "🌳",
+                options: ["🌳", "🌸", "🍄", "🌿"]
+            },
+            {
+                word: "NUVEM",
+                correct: "☁️",
+                options: ["☁️", "🌧️", "⛈️", "🌈"]
+            },
+            {
+                word: "CHUVA",
+                correct: "🌧️",
+                options: ["🌧️", "☁️", "⛈️", "❄️"]
+            },
+            
+            // Transporte
+            {
+                word: "CARRO",
+                correct: "🚗",
+                options: ["🚗", "🚂", "✈️", "🚲"]
+            },
+            {
+                word: "AVIÃO",
+                correct: "✈️",
+                options: ["✈️", "🚗", "🚂", "🚲"]
+            },
+            {
+                word: "TREM",
+                correct: "🚂",
+                options: ["🚂", "🚗", "✈️", "🚢"]
+            },
+            {
+                word: "BICICLETA",
+                correct: "🚲",
+                options: ["🚲", "🚗", "🛴", "🏍️"]
+            },
+            {
+                word: "ÔNIBUS",
+                correct: "🚌",
+                options: ["🚌", "🚗", "🚂", "🚛"]
+            },
+            
+            // Frutas
+            {
+                word: "MAÇÃ",
+                correct: "🍎",
+                options: ["🍎", "🍌", "🍊", "🍇"]
+            },
+            {
+                word: "BANANA",
+                correct: "🍌",
+                options: ["🍌", "🍎", "🍊", "🥝"]
+            },
+            {
+                word: "LARANJA",
+                correct: "🍊",
+                options: ["🍊", "🍎", "🍌", "🍑"]
+            },
+            {
+                word: "UVA",
+                correct: "🍇",
+                options: ["🍇", "🍓", "🍒", "🫐"]
+            },
+            {
+                word: "MORANGO",
+                correct: "🍓",
+                options: ["🍓", "🍒", "🍇", "🫐"]
+            },
+            
+            // Esportes e Brinquedos
+            {
+                word: "BOLA",
+                correct: "⚽",
+                options: ["⚽", "🏀", "🎾", "🏐"]
+            },
+            {
+                word: "BONECA",
+                correct: "🪆",
+                options: ["🪆", "🧸", "🎮", "🎲"]
+            },
+            {
+                word: "URSO",
+                correct: "🧸",
+                options: ["🧸", "🪆", "🎈", "🎁"]
+            },
+            {
+                word: "BALÃO",
+                correct: "🎈",
+                options: ["🎈", "🎁", "🎂", "🧸"]
+            },
+            
+            // Escola
+            {
+                word: "LIVRO",
+                correct: "📚",
+                options: ["📚", "📝", "🖊️", "📄"]
+            },
+            {
+                word: "LÁPIS",
+                correct: "✏️",
+                options: ["✏️", "🖊️", "🖍️", "📏"]
+            },
+            {
+                word: "ESCOLA",
+                correct: "🏫",
+                options: ["🏫", "🏠", "🏪", "🏥"]
+            },
+            {
+                word: "MOCHILA",
+                correct: "🎒",
+                options: ["🎒", "👜", "🛍️", "💼"]
+            },
+            
+            // Comida
+            {
+                word: "PÃO",
+                correct: "🍞",
+                options: ["🍞", "🥖", "🧀", "🥛"]
+            },
+            {
+                word: "LEITE",
+                correct: "🥛",
+                options: ["🥛", "🧃", "☕", "🍷"]
+            },
+            {
+                word: "OVO",
+                correct: "🥚",
+                options: ["🥚", "🍳", "🧀", "🥛"]
+            },
+            {
+                word: "PIZZA",
+                correct: "🍕",
+                options: ["🍕", "🍔", "🌭", "🍟"]
+            },
+            {
+                word: "HAMBÚRGUER",
+                correct: "🍔",
+                options: ["🍔", "🍕", "🌭", "🥪"]
+            },
+            
+            // Corpo humano
+            {
+                word: "MÃO",
+                correct: "✋",
+                options: ["✋", "👁️", "👂", "👃"]
+            },
+            {
+                word: "OLHO",
+                correct: "👁️",
+                options: ["👁️", "👂", "👃", "👄"]
+            },
+            {
+                word: "CORAÇÃO",
+                correct: "❤️",
+                options: ["❤️", "🧠", "🫁", "🦴"]
+            },
+            
+            // Profissões
+            {
+                word: "MÉDICO",
+                correct: "👨‍⚕️",
+                options: ["👨‍⚕️", "👨‍🏫", "👨‍🚒", "👨‍🍳"]
+            },
+            {
+                word: "PROFESSOR",
+                correct: "👨‍🏫",
+                options: ["👨‍🏫", "👨‍⚕️", "👨‍🔧", "👨‍🚒"]
+            },
+            
+            // Instrumentos musicais
+            {
+                word: "VIOLÃO",
+                correct: "🎸",
+                options: ["🎸", "🎹", "🥁", "🎺"]
+            },
+            {
+                word: "PIANO",
+                correct: "🎹",
+                options: ["🎹", "🎸", "🥁", "🎻"]
+            },
+            
+            // Tempo
+            {
+                word: "RELÓGIO",
+                correct: "⏰",
+                options: ["⏰", "⌚", "📅", "🕐"]
+            },
+            
+            // Cores (usando objetos coloridos)
+            {
+                word: "VERDE",
+                correct: "🥬",
+                options: ["🥬", "🍅", "🟡", "🔵"]
+            },
+            {
+                word: "VERMELHO",
+                correct: "🍅",
+                options: ["🍅", "🥬", "🟡", "🔵"]
+            },
+            
+            // Números
+            {
+                word: "UM",
+                correct: "1️⃣",
+                options: ["1️⃣", "2️⃣", "3️⃣", "4️⃣"]
+            },
+            {
+                word: "DOIS",
+                correct: "2️⃣",
+                options: ["2️⃣", "1️⃣", "3️⃣", "4️⃣"]
+            },
+            {
+                word: "TRÊS",
+                correct: "3️⃣",
+                options: ["3️⃣", "1️⃣", "2️⃣", "4️⃣"]
+            }
+        ];
+
+        let currentWordIndex = 0;
+        let correctAnswers = 0;
+        let totalAnswers = 0;
+        let gameEnded = false;
+
+        // Elementos do DOM
+        const wordDisplay = document.getElementById('word-display');
+        const imagesContainer = document.getElementById('images-container');
+        const feedback = document.getElementById('feedback');
+        const nextButton = document.getElementById('next-button');
+        const correctScoreElement = document.getElementById('correct-score');
+        const totalScoreElement = document.getElementById('total-score');
+
+        function loadCurrentWord() {
+            if (currentWordIndex >= gameData.length) {
+                endGame();
+                return;
+            }
+
+            const currentData = gameData[currentWordIndex];
+            wordDisplay.textContent = currentData.word;
+            
+            // Limpar container de imagens
+            imagesContainer.innerHTML = '';
+            
+            // Embaralhar as opções
+            const shuffledOptions = [...currentData.options].sort(() => Math.random() - 0.5);
+            
+            // Criar elementos de imagem
+            shuffledOptions.forEach(emoji => {
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'image-option';
+                imageDiv.textContent = emoji;
+                imageDiv.onclick = () => selectImage(emoji, imageDiv);
+                imagesContainer.appendChild(imageDiv);
+            });
+
+            // Resetar feedback e botão
+            feedback.textContent = '';
+            feedback.className = 'feedback';
+            nextButton.disabled = true;
+        }
+
+        function selectImage(selectedEmoji, element) {
+            if (gameEnded) return;
+
+            const currentData = gameData[currentWordIndex];
+            const isCorrect = selectedEmoji === currentData.correct;
+            
+            totalAnswers++;
+            
+            // Desabilitar todas as opções
+            const allOptions = document.querySelectorAll('.image-option');
+            allOptions.forEach(option => {
+                option.onclick = null;
+                if (option.textContent === currentData.correct) {
+                    option.classList.add('correct');
+                } else if (option === element && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            if (isCorrect) {
+                correctAnswers++;
+                feedback.textContent = '🎉 Muito bem! Resposta correta! 🎉';
+                feedback.className = 'feedback correct';
+                showCelebration('🎉');
+            } else {
+                feedback.textContent = '❌ Ops! Tente novamente na próxima!';
+                feedback.className = 'feedback incorrect';
+            }
+
+            // Atualizar placar
+            correctScoreElement.textContent = correctAnswers;
+            totalScoreElement.textContent = totalAnswers;
+
+            // Habilitar botão próxima
+            nextButton.disabled = false;
+        }
+
+        function nextWord() {
+            currentWordIndex++;
+            loadCurrentWord();
+        }
+
+        function showCelebration(emoji) {
+            const celebration = document.createElement('div');
+            celebration.className = 'celebration';
+            celebration.textContent = emoji;
+            document.body.appendChild(celebration);
+            
+            setTimeout(() => {
+                document.body.removeChild(celebration);
+            }, 1000);
+        }
+
+        function endGame() {
+            gameEnded = true;
+            const percentage = Math.round((correctAnswers / totalAnswers) * 100);
+            
+            wordDisplay.textContent = '🎊 PARABÉNS! 🎊';
+            imagesContainer.innerHTML = `
+                <div style="grid-column: 1/-1; font-size: 1.5rem; padding: 2rem; background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); border-radius: 15px; border: 2px solid #f6ad55;">
+                    <p>🏆 Você completou o jogo! 🏆</p>
+                    <p>Acertou ${correctAnswers} de ${totalAnswers} palavras</p>
+                    <p>Sua pontuação: ${percentage}%</p>
+                    <button onclick="restartGame()" style="margin-top: 1rem; padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 20px; cursor: pointer; font-size: 1.1rem;">
+                        🔄 Jogar Novamente
+                    </button>
+                </div>
+            `;
+            
+            feedback.textContent = percentage >= 70 ? '🌟 Excelente trabalho!' : '💪 Continue praticando!';
+            feedback.className = 'feedback correct';
+            nextButton.style.display = 'none';
+            
+            showCelebration('🎊');
+        }
+
+        function restartGame() {
+            currentWordIndex = 0;
+            correctAnswers = 0;
+            totalAnswers = 0;
+            gameEnded = false;
+            
+            correctScoreElement.textContent = '0';
+            totalScoreElement.textContent = '0';
+            nextButton.style.display = 'inline-block';
+            
+            loadCurrentWord();
+        }
+
+        // Inicializar o jogo
+        loadCurrentWord();
+    </script>
+</body>
+</html>
